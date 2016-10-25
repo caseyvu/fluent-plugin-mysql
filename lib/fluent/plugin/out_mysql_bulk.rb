@@ -14,7 +14,15 @@ module Fluent
     config_param :username, :string,
                  :desc => "Database user."
     config_param :password, :string, default: '', secret: true,
-                 :desc => "Database password."
+                 desc: "Database password."
+    config_param :sslca, :string, default: nil,
+                 :desc => "Path of file that contains list of trusted SSL CAs."
+    config_param :sslcapath, :string, default: nil,
+                 :desc => "Path of directory that contains trusted SSL CA certificates."
+    config_param :sslverify, :bool, default: nil,
+                 :desc => "Verify server certificate."
+    config_param :sslcipher, :string, default: nil,
+                 :desc => "List of permitted ciphers to use for connection encryption."
 
     config_param :column_names, :string,
                  :desc => "Bulk insert column."
@@ -94,15 +102,37 @@ DESC
       [tag, time, format_proc.call(tag, time, record)].to_msgpack
     end
 
-    def client
-      Mysql2::Client.new(
+    def formatted_to_msgpack_binary
+      true
+    end
+
+    def client(database)
+      options = {
           host: @host,
           port: @port,
           username: @username,
           password: @password,
-          database: @database,
-          flags: Mysql2::Client::MULTI_STATEMENTS
-        )
+          database: database,
+          flags: Mysql2::Client::MULTI_STATEMENTS,
+      }
+
+      if @sslca.nil?
+        options[:sslca] = @sslca
+      end
+
+      if @sslcapath.nil?
+        options[:sslcapath] = @sslcapath
+      end
+
+      if @sslverify.nil?
+        options[:sslverify] = @sslverify
+      end
+      
+      if @sslcipher.nil?
+        options[:sslcipher] = @sslcipher
+      end
+
+      Mysql2::Client.new(options)
     end
 
     def write(chunk)
