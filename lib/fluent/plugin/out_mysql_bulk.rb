@@ -102,33 +102,29 @@ DESC
       [tag, time, format_proc.call(tag, time, record)].to_msgpack
     end
 
-    def formatted_to_msgpack_binary
-      true
-    end
-
-    def client(database)
+    def client
       options = {
           host: @host,
           port: @port,
           username: @username,
           password: @password,
-          database: database,
+          database: @database,
           flags: Mysql2::Client::MULTI_STATEMENTS,
       }
 
-      if @sslca.nil?
+      unless @sslca.nil?
         options[:sslca] = @sslca
       end
 
-      if @sslcapath.nil?
+      unless @sslcapath.nil?
         options[:sslcapath] = @sslcapath
       end
 
-      if @sslverify.nil?
+      unless @sslverify.nil?
         options[:sslverify] = @sslverify
       end
       
-      if @sslcipher.nil?
+      unless @sslcipher.nil?
         options[:sslcipher] = @sslcipher
       end
 
