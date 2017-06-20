@@ -5,16 +5,20 @@ module Fluent
 
     include Fluent::SetTimeKeyMixin
 
-    config_param :host, :string, default: '127.0.0.1',
+    config_param :host, :string,
                  :desc => "Database host."
-    config_param :port, :integer, default: 3306,
+    config_param :port, :integer,
                  :desc => "Database port."
     config_param :database, :string,
                  :desc => "Database name."
     config_param :username, :string,
                  :desc => "Database user."
-    config_param :password, :string, default: '', secret: true,
+    config_param :password, :string, secret: true,
                  desc: "Database password."
+    config_param :default_file, :string,
+                 desc: "MySQL default config file."
+    config_param :default_group, :string,
+                 desc: "MySQL default config section."
     config_param :sslca, :string, default: nil,
                  :desc => "Path of file that contains list of trusted SSL CAs."
     config_param :sslcapath, :string, default: nil,
@@ -104,13 +108,33 @@ DESC
 
     def client
       options = {
-          host: @host,
-          port: @port,
-          username: @username,
-          password: @password,
           database: @database,
           flags: Mysql2::Client::MULTI_STATEMENTS,
       }
+
+      unless @default_file.nil?
+        option[:default_file] = @default_file
+      end
+
+      unless @default_group.nil?
+        option[:default_group] = @default_group
+      end
+
+      unless @host.nil?
+        options[:host] = @host
+      end
+
+      unless @port.nil?
+        options[:port] = @port
+      end
+
+      unless @username.nil?
+        options[:username] = @username
+      end
+
+      unless @password.nil?
+        options[:password] = @password
+      end
 
       unless @sslca.nil?
         options[:sslca] = @sslca
@@ -123,7 +147,7 @@ DESC
       unless @sslverify.nil?
         options[:sslverify] = @sslverify
       end
-      
+
       unless @sslcipher.nil?
         options[:sslcipher] = @sslcipher
       end
