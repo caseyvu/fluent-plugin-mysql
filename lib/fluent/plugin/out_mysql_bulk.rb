@@ -5,19 +5,19 @@ module Fluent
 
     include Fluent::SetTimeKeyMixin
 
-    config_param :host, :string,
+    config_param :host, :string, default: nil,
                  :desc => "Database host."
-    config_param :port, :integer,
+    config_param :port, :integer, default: nil,
                  :desc => "Database port."
     config_param :database, :string,
                  :desc => "Database name."
-    config_param :username, :string,
+    config_param :username, :string, default: nil,
                  :desc => "Database user."
-    config_param :password, :string, secret: true,
+    config_param :password, :string, default: nil, secret: true,
                  desc: "Database password."
-    config_param :default_file, :string,
+    config_param :default_file, :string, default: nil,
                  desc: "MySQL default config file."
-    config_param :default_group, :string,
+    config_param :default_group, :string, default: nil,
                  desc: "MySQL default config section."
     config_param :sslca, :string, default: nil,
                  :desc => "Path of file that contains list of trusted SSL CAs."
@@ -113,11 +113,11 @@ DESC
       }
 
       unless @default_file.nil?
-        option[:default_file] = @default_file
+        options[:default_file] = @default_file
       end
 
       unless @default_group.nil?
-        option[:default_group] = @default_group
+        options[:default_group] = @default_group
       end
 
       unless @host.nil?
